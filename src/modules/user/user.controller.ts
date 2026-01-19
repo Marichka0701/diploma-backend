@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Request,
   UseGuards,
@@ -20,6 +21,18 @@ export class UserController {
     return await this.userService.getAll();
   }
 
+  @Get('/current-user')
+  public async getCurrentUser(@Request() request) {
+    const userId = request.user.userId;
+
+    return await this.userService.getById(userId);
+  }
+
+  @Get('/:id')
+  public async getById(@Param('id') id: string) {
+    return await this.userService.getById(id);
+  }
+
   @Post('/change-password')
   public async changePassword(
     @Request() request,
@@ -28,12 +41,5 @@ export class UserController {
     const userId = request.user.userId;
 
     return await this.userService.changePassword(userId, dto);
-  }
-
-  @Get('/current-user')
-  public async getCurrentUser(@Request() request) {
-    const userId = request.user.userId;
-
-    return await this.userService.getCurrentUser(userId);
   }
 }

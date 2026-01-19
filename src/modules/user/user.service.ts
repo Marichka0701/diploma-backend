@@ -36,6 +36,12 @@ export class UserService {
     return user;
   }
 
+  public async getById(userId: string): Promise<UserEntity> {
+    return await this.getByParamsOrThrowError({
+      id: userId,
+    });
+  }
+
   public async createUser(userDto: Partial<UserEntity>): Promise<UserEntity> {
     const user = this.userRepository.create(userDto);
     await this.userRepository.save(user);
@@ -76,11 +82,5 @@ export class UserService {
     });
 
     return { message: 'Password changed successfully' };
-  }
-
-  public async getCurrentUser(userId: string): Promise<UserEntity> {
-    return await this.getByParamsOrThrowError({
-      id: userId,
-    });
   }
 }
