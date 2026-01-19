@@ -1,19 +1,25 @@
-import { Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { CreateCleanerDto } from './dtos/requests/create-cleaner';
+import { CreateUserDto } from './dtos/requests/create-user.dto';
+import { LoginDto } from './dtos/requests/login.dto';
 
 @Controller('auth')
 export class AuthController {
+  constructor(private readonly authService: AuthService) {}
+
   @Post('/login')
-  async login() {
-    return { message: 'Login successful' };
+  async login(@Body() dto: LoginDto) {
+    return await this.authService.login(dto);
   }
 
   @Post('/register/cleaner')
-  async createCleaner() {
-    return { message: 'Cleaner created' };
+  async createCleaner(@Body() dto: CreateCleanerDto) {
+    await this.authService.createCleaner(dto);
   }
 
   @Post('/register/user')
-  async createUser() {
-    return { message: 'User created' };
+  async createUser(@Body() dto: CreateUserDto) {
+    await this.authService.createUser(dto);
   }
 }

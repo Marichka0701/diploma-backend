@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserEntity } from 'src/modules/user/entities/user.entity';
 
 @Module({
   imports: [
@@ -10,7 +11,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       username: 'diploma_user',
       password: '12345',
       database: 'dev',
-      entities: [],
+      entities: [UserEntity],
       synchronize: true,
     }),
   ],
