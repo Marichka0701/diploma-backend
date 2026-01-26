@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { OrderEntity } from 'src/modules/order/entities/order.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { EUserRole } from '../enums/role.enum';
 
 @Entity('users')
@@ -59,4 +60,7 @@ export class UserEntity {
 
   @Column({ type: 'boolean', default: false })
   hasInventory: boolean;
+
+  @OneToMany(() => OrderEntity, (order) => order.user, { cascade: true })
+  orders: OrderEntity[];
 }

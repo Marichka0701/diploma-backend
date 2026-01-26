@@ -1,5 +1,4 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { AUTH_CONSTANTS } from 'src/shared/constants/auth.constants';
@@ -13,7 +12,6 @@ export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-    private readonly jwtService: JwtService,
   ) {}
 
   public async getAll(): Promise<UserEntity[]> {
@@ -37,9 +35,15 @@ export class UserService {
   }
 
   public async getById(userId: string): Promise<UserEntity> {
-    return await this.getByParamsOrThrowError({
+    const user = await this.getByParamsOrThrowError({
       id: userId,
     });
+
+    if (!user) {
+      throw new BadRequestException(UserErrors.USER_NOT_FOUND);
+    }
+
+    return user;
   }
 
   public async createUser(userDto: Partial<UserEntity>): Promise<UserEntity> {
