@@ -5,3 +5,5 @@ export type JWTPayload = {
   iat: number;
   exp: number;
 };
+
+export type JWTUser = Omit<JWTPayload, 'iat' | 'exp'>;

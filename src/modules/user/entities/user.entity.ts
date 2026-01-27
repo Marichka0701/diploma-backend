@@ -1,3 +1,4 @@
+import { ApplicationEntity } from 'src/modules/application/entities/application.entity';
 import { OrderEntity } from 'src/modules/order/entities/order.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { EUserRole } from '../enums/role.enum';
@@ -25,7 +26,7 @@ export class UserEntity {
   @Column({ type: 'varchar', nullable: true })
   taxCode: string | null;
 
-  @Column({ type: 'enum', default: 'user', enum: EUserRole })
+  @Column({ type: 'enum', default: EUserRole.USER, enum: EUserRole })
   role: string;
 
   @Column({ type: 'varchar', nullable: true })
@@ -63,4 +64,7 @@ export class UserEntity {
 
   @OneToMany(() => OrderEntity, (order) => order.user, { cascade: true })
   orders: OrderEntity[];
+
+  @OneToMany(() => ApplicationEntity, (app) => app.cleaner)
+  applications: ApplicationEntity[];
 }

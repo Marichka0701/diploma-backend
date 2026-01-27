@@ -10,18 +10,15 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { OrderStatus } from 'src/shared/enums/order-status.enum';
-import { ApplicationService } from '../application/application.service';
 import { AuthGuard } from '../auth/guards/auth.guard';
+import { CreateApplicationDto } from './dtos/requests/create-application.dto';
 import { CreateOrderDto } from './dtos/requests/create-order.dto';
 import { OrderService } from './order.service';
 
 @Controller('order')
 @UseGuards(AuthGuard)
 export class OrderController {
-  constructor(
-    private readonly orderService: OrderService,
-    private readonly applicationService: ApplicationService,
-  ) {}
+  constructor(private readonly orderService: OrderService) {}
 
   @Get('/')
   public async getAll(
@@ -44,7 +41,22 @@ export class OrderController {
 
   @Get('/:id/applications')
   public async getAllApplicationsByOrderId(@Param('id') id: string) {
-    return await this.applicationService.getAllByOrderId(id);
+    return await this.orderService.getAllApplicationsByOrderId(id);
+  }
+
+  @Post('/:id/application')
+  public async createApplicationForOrderId(
+    @Request() request,
+    @Param('id') orderId: string,
+    @Body() dto: CreateApplicationDto,
+  ) {
+    const user = request.user;
+
+    return await this.orderService.createApplicationForOrderId(
+      orderId,
+      user,
+      dto,
+    );
   }
 
   @Get('/:id')

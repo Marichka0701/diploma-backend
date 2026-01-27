@@ -1,5 +1,15 @@
+import { OrderEntity } from 'src/modules/order/entities/order.entity';
 import { UserEntity } from 'src/modules/user/entities/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { ApplicationStatus } from '../enums/application-status.enum';
 
 @Entity('applications')
 export class ApplicationEntity {
@@ -12,12 +22,34 @@ export class ApplicationEntity {
   @Column({ type: 'varchar' })
   coverLetter: string;
 
-  @Column({ type: 'varchar' })
-  badge: string;
+  @Column({
+    type: 'enum',
+    enum: ApplicationStatus,
+    default: ApplicationStatus.CREATED,
+  })
+  status: ApplicationStatus;
 
-  @ManyToOne(() => UserEntity, (user) => user.orders)
-  user: UserEntity;
+  @ManyToOne(() => OrderEntity, (order) => order.applications, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'order_id' })
+  order: OrderEntity;
 
-  @ManyToOne(() => UserEntity, (cleaner) => cleaner.id, { nullable: true })
+  @Column({ name: 'order_id' })
+  orderId: string;
+
+  @ManyToOne(() => UserEntity, (user) => user.applications, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'cleaner_id' })
   cleaner: UserEntity;
+
+  @Column({ name: 'cleaner_id' })
+  cleanerId: string;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 }
