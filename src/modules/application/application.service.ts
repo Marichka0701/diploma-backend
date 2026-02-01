@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JWTUser } from 'src/shared/types/jwt.type';
 import { Repository } from 'typeorm';
@@ -32,6 +32,15 @@ export class ApplicationService {
       cleaner: { id: user.userId },
       status: ApplicationStatus.CREATED,
     };
+
+    const applicationExists = await this.applicationRepository.findOneBy({
+      cleanerId: user.userId,
+    });
+    if (applicationExists) {
+      throw new BadRequestException(
+        'Application from this cleaner already exists',
+      );
+    }
 
     return await this.applicationRepository.save(application);
   }
