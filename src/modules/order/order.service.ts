@@ -1,9 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrderStatus } from 'src/shared/enums/order-status.enum';
 import { JWTUser } from 'src/shared/types/jwt.type';
 import { Repository } from 'typeorm';
 import { ApplicationService } from '../application/application.service';
+import { EUserRole } from '../user/enums/role.enum';
 import { CreateApplicationDto } from './dtos/requests/create-application.dto';
 import { CreateOrderDto } from './dtos/requests/create-order.dto';
 import { OrderEntity } from './entities/order.entity';
@@ -16,19 +21,51 @@ export class OrderService {
     private readonly orderRepository: Repository<OrderEntity>,
   ) {}
 
-  public async getAllByCurrentUser(userId: string, status?: OrderStatus) {
+  public async getAllByCurrentUser(
+    userId: string,
+    params: { status?: OrderStatus },
+  ) {
     return await this.orderRepository.findBy({
       user: { id: userId },
-      status,
+      status: params.status,
     });
   }
 
-  public async create(dto: CreateOrderDto) {
-    return await this.orderRepository.save(dto);
+  public async create(userId: string, dto: CreateOrderDto) {
+    console.log({
+      ...dto,
+      user: { id: userId },
+    });
+    return await this.orderRepository.save({
+      ...dto,
+      user: { id: userId },
+    });
   }
 
-  public async getAllApplicationsByOrderId(id: string) {
-    return await this.applicationService.getAllByOrderId(id);
+  public async cancel(id: string) {
+    const order = await this.getById(id);
+
+    if (
+      order.status !== OrderStatus.CREATED &&
+      order.applications.length === 0
+    ) {
+      throw new NotFoundException(
+        'Only orders with CREATED status can be cancelled and without applications',
+      );
+    }
+
+    // we can cancel only created orders
+    return await this.orderRepository.save({
+      ...order,
+      status: OrderStatus.CANCELLED,
+    });
+  }
+
+  public async getAllApplicationsByOrderId(
+    id: string,
+    params: { price?: number },
+  ) {
+    return await this.applicationService.getAllByOrderId(id, params);
   }
 
   public async createApplicationForOrderId(
@@ -36,6 +73,10 @@ export class OrderService {
     user: JWTUser,
     dto: CreateApplicationDto,
   ) {
+    if (user.role !== EUserRole.CLEANER) {
+      throw new BadRequestException('You are not a cleaner');
+    }
+
     return await this.applicationService.create(orderId, user, dto);
   }
 

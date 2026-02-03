@@ -1,3 +1,4 @@
+import { OfferEntity } from 'src/modules/offer/entities/offer.entity';
 import { OrderEntity } from 'src/modules/order/entities/order.entity';
 import { UserEntity } from 'src/modules/user/entities/user.entity';
 import {
@@ -6,6 +7,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -35,17 +37,15 @@ export class ApplicationEntity {
   @JoinColumn({ name: 'order_id' })
   order: OrderEntity;
 
-  @Column({ name: 'order_id' })
-  orderId: string;
+  @OneToOne(() => OfferEntity)
+  @JoinColumn({ name: 'offer_id' })
+  offer: OfferEntity;
 
   @ManyToOne(() => UserEntity, (user) => user.applications, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'cleaner_id' })
   cleaner: UserEntity;
-
-  @Column({ name: 'cleaner_id' })
-  cleanerId: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

@@ -27,7 +27,7 @@ export class UserEntity {
   taxCode: string | null;
 
   @Column({ type: 'enum', default: EUserRole.USER, enum: EUserRole })
-  role: string;
+  role: EUserRole;
 
   @Column({ type: 'varchar', nullable: true })
   cardNumer: string | null;
@@ -62,9 +62,13 @@ export class UserEntity {
   @Column({ type: 'boolean', default: false })
   hasInventory: boolean;
 
-  @OneToMany(() => OrderEntity, (order) => order.user, { cascade: true })
+  @OneToMany(() => OrderEntity, (order) => order.user, {
+    cascade: true,
+  })
   orders: OrderEntity[];
 
-  @OneToMany(() => ApplicationEntity, (app) => app.cleaner)
+  @OneToMany(() => ApplicationEntity, (application) => application.cleaner, {
+    cascade: true,
+  })
   applications: ApplicationEntity[];
 }

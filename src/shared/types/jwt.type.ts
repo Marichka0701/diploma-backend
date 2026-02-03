@@ -1,7 +1,9 @@
+import { EUserRole } from 'src/modules/user/enums/role.enum';
+
 export type JWTPayload = {
   userId: string;
   email: string;
-  role: string;
+  role: EUserRole;
   iat: number;
   exp: number;
 };

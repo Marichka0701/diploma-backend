@@ -25,23 +25,33 @@ export class OrderController {
     @Request() request,
     @Query('status') status?: OrderStatus,
   ) {
-    const userId = request.user.id;
+    const userId = request.user.userId;
 
     if (status && !Object.values(OrderStatus).includes(status)) {
       throw new BadRequestException('Invalid order status');
     }
 
-    return await this.orderService.getAllByCurrentUser(userId, status);
+    return await this.orderService.getAllByCurrentUser(userId, { status });
   }
 
   @Post('/')
-  public async create(@Body() dto: CreateOrderDto) {
-    return await this.orderService.create(dto);
+  public async create(@Body() dto: CreateOrderDto, @Request() request) {
+    const userId = request.user.userId;
+
+    return await this.orderService.create(userId, dto);
+  }
+
+  @Post('/:id/cancel')
+  public async cancel(@Param('id') id: string) {
+    return await this.orderService.cancel(id);
   }
 
   @Get('/:id/applications')
-  public async getAllApplicationsByOrderId(@Param('id') id: string) {
-    return await this.orderService.getAllApplicationsByOrderId(id);
+  public async getAllApplicationsByOrderId(
+    @Param('id') id: string,
+    @Query('price') price?: number,
+  ) {
+    return await this.orderService.getAllApplicationsByOrderId(id, { price });
   }
 
   @Post('/:id/application')

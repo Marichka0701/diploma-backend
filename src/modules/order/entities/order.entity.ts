@@ -1,11 +1,14 @@
 import { ApplicationEntity } from 'src/modules/application/entities/application.entity';
+import { OfferEntity } from 'src/modules/offer/entities/offer.entity';
 import { UserEntity } from 'src/modules/user/entities/user.entity';
 import { OrderStatus } from 'src/shared/enums/order-status.enum';
 import {
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ECleaningType } from '../enums/cleaningType.enum';
@@ -38,7 +41,7 @@ export class OrderEntity {
     enum: ECleaningType,
     nullable: true,
   })
-  cleaningType?: string;
+  cleaningType?: ECleaningType;
 
   @Column({ type: 'int' })
   square: number;
@@ -77,11 +80,16 @@ export class OrderEntity {
   status: OrderStatus;
 
   @ManyToOne(() => UserEntity, (user) => user.orders)
+  @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
   @ManyToOne(() => UserEntity, (cleaner) => cleaner.id, { nullable: true })
+  @JoinColumn({ name: 'cleaner_id' })
   cleaner: UserEntity;
 
-  @OneToMany(() => ApplicationEntity, (application) => application.orderId)
+  @OneToMany(() => ApplicationEntity, (application) => application.order)
   applications: ApplicationEntity[];
+
+  @OneToOne(() => OfferEntity)
+  offer: OfferEntity;
 }

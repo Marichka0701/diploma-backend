@@ -6,7 +6,6 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { UserEntity } from 'src/modules/user/entities/user.entity';
 import { ECleaningType } from '../../enums/cleaningType.enum';
 
 export class CreateOrderDto {
@@ -81,10 +80,4 @@ export class CreateOrderDto {
   @IsString()
   @IsOptional()
   homeAccessAdditionalInstructions?: string;
-
-  @IsNotEmpty()
-  user: UserEntity;
-
-  @IsOptional()
-  cleaner: UserEntity;
 }
