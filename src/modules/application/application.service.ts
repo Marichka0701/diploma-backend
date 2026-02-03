@@ -1,9 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JWTUser } from 'src/shared/types/jwt.type';
 import { Repository } from 'typeorm';
 import { CreateApplicationDto } from '../order/dtos/requests/create-application.dto';
-import { EUserRole } from '../user/enums/role.enum';
 import { ApplicationEntity } from './entities/application.entity';
 import { ApplicationStatus } from './enums/application-status.enum';
 
@@ -14,15 +17,30 @@ export class ApplicationService {
     private readonly applicationRepository: Repository<ApplicationEntity>,
   ) {}
 
-  public async getAllByCurrentCleaner(user: JWTUser) {
-    if (user.role !== EUserRole.CLEANER) {
-      throw new BadRequestException('You are not a cleaner');
-    }
-    const applications = await this.applicationRepository.findBy({
-      cleaner: { id: user.userId },
+  public async getAllByCurrentCleaner(userId: string) {
+    const applications = await this.applicationRepository.find({
+      where: {
+        cleaner: { id: userId },
+      },
+      relations: ['order'],
     });
 
     return applications;
+  }
+
+  public async getById(applicationId: string) {
+    const application = await this.applicationRepository.findOne({
+      where: {
+        id: applicationId,
+      },
+      relations: ['order'],
+    });
+
+    if (!application) {
+      throw new NotFoundException('Application not found');
+    }
+
+    return application;
   }
 
   public async getAllByOrderId(id: string, params: { price?: number }) {

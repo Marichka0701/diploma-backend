@@ -77,6 +77,11 @@ export class OrderService {
       throw new BadRequestException('You are not a cleaner');
     }
 
+    const order = await this.getById(orderId);
+    if (order.status !== OrderStatus.CREATED) {
+      throw new BadRequestException('Order status is not CREATED');
+    }
+
     return await this.applicationService.create(orderId, user, dto);
   }
 
