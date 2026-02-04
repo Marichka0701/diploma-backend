@@ -80,16 +80,16 @@ export class OrderEntity {
   status: OrderStatus;
 
   @ManyToOne(() => UserEntity, (user) => user.orders)
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn({ name: 'userId' })
   user: UserEntity;
 
   @ManyToOne(() => UserEntity, (cleaner) => cleaner.id, { nullable: true })
-  @JoinColumn({ name: 'cleaner_id' })
+  @JoinColumn({ name: 'cleanerId' })
   cleaner: UserEntity;
 
   @OneToMany(() => ApplicationEntity, (application) => application.order)
   applications: ApplicationEntity[];
 
-  @OneToOne(() => OfferEntity)
+  @OneToOne(() => OfferEntity, (offer) => offer.order, { nullable: true })
   offer: OfferEntity;
 }

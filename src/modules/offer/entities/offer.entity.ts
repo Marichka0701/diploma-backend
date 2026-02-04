@@ -1,6 +1,7 @@
 import { ApplicationEntity } from 'src/modules/application/entities/application.entity';
 import { OrderEntity } from 'src/modules/order/entities/order.entity';
 import {
+  Column,
   CreateDateColumn,
   Entity,
   OneToOne,
@@ -13,15 +14,18 @@ export class OfferEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToOne(() => ApplicationEntity)
+  @OneToOne(() => ApplicationEntity, (application) => application.offer)
   application: ApplicationEntity;
 
-  @OneToOne(() => OrderEntity)
+  @Column({ type: 'uuid' })
+  applicationId: string;
+
+  @OneToOne(() => OrderEntity, (order) => order.offer)
   order: OrderEntity;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'createdAt' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ name: 'updatedAt' })
   updatedAt: Date;
 }

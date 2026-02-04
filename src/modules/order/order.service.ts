@@ -32,10 +32,6 @@ export class OrderService {
   }
 
   public async create(userId: string, dto: CreateOrderDto) {
-    console.log({
-      ...dto,
-      user: { id: userId },
-    });
     return await this.orderRepository.save({
       ...dto,
       user: { id: userId },

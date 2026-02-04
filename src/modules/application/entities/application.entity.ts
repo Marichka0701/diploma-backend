@@ -34,22 +34,22 @@ export class ApplicationEntity {
   @ManyToOne(() => OrderEntity, (order) => order.applications, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'order_id' })
+  @JoinColumn({ name: 'orderId' })
   order: OrderEntity;
 
-  @OneToOne(() => OfferEntity)
-  @JoinColumn({ name: 'offer_id' })
+  @OneToOne(() => OfferEntity, (offer) => offer.application)
+  @JoinColumn({ name: 'offerId' })
   offer: OfferEntity;
 
   @ManyToOne(() => UserEntity, (user) => user.applications, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'cleaner_id' })
+  @JoinColumn({ name: 'cleanerId' })
   cleaner: UserEntity;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'createdAt' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ name: 'updatedAt' })
   updatedAt: Date;
 }
