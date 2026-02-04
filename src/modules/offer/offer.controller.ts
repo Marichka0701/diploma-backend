@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Request,
   UseGuards,
@@ -32,5 +33,12 @@ export class OfferController {
   @UseGuards(RolesGuard)
   public async create(@Body() dto: CreateOfferDto) {
     return await this.offerService.create(dto);
+  }
+
+  @Get('/:id')
+  @Roles([EUserRole.CLEANER])
+  @UseGuards(RolesGuard)
+  public async getById(@Param('id') id: string) {
+    return await this.offerService.getById(id);
   }
 }

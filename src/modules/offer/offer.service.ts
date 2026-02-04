@@ -38,4 +38,13 @@ export class OfferService {
       application: { id: dto.applicationId },
     });
   }
+
+  public async getById(id: string) {
+    return await this.offerRepository.findOne({
+      where: {
+        id,
+      },
+      relations: ['application', 'application.cleaner'],
+    });
+  }
 }
