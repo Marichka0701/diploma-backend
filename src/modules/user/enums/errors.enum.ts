@@ -1,4 +1,4 @@
-export enum UserErrors {
+export enum EUserErrors {
   INVALID_TOKEN = 'INVALID_TOKEN',
   USER_NOT_FOUND = 'USER_NOT_FOUND',
   INVALID_OLD_PASSWORD = 'INVALID_OLD_PASSWORD',

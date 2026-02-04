@@ -3,9 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { AUTH_CONSTANTS } from 'src/shared/constants/auth.constants';
 import { FindOptionsWhere, Repository } from 'typeorm';
-import { ChangePasswordDto } from './dtos/requests/change-password.dto';
+import { ChangePasswordDto } from './dtos/requests/changePassword.dto';
 import { UserEntity } from './entities/user.entity';
-import { UserErrors } from './enums/errors.enum';
+import { EUserErrors } from './enums/errors.enum';
 
 @Injectable()
 export class UserService {
@@ -28,7 +28,7 @@ export class UserService {
       .getOne();
 
     if (!user) {
-      throw new BadRequestException(UserErrors.USER_NOT_FOUND);
+      throw new BadRequestException(EUserErrors.USER_NOT_FOUND);
     }
 
     return user;
@@ -40,7 +40,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new BadRequestException(UserErrors.USER_NOT_FOUND);
+      throw new BadRequestException(EUserErrors.USER_NOT_FOUND);
     }
 
     return user;
@@ -72,7 +72,7 @@ export class UserService {
       user.password,
     );
     if (!isOldPasswordValid) {
-      throw new BadRequestException(UserErrors.INVALID_OLD_PASSWORD);
+      throw new BadRequestException(EUserErrors.INVALID_OLD_PASSWORD);
     }
 
     const hashedPassword = await bcrypt.hash(

@@ -1,5 +1,5 @@
 import { IsBoolean, IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { BaseUserDto } from './base-user.dto';
+import { BaseUserDto } from './baseUser.dto';
 
 export class CreateCleanerDto extends BaseUserDto {
   @IsString()

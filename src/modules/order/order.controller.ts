@@ -9,10 +9,10 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { OrderStatus } from 'src/shared/enums/order-status.enum';
+import { EOrderStatus } from 'src/modules/order/enums/orderStatus.enum';
 import { AuthGuard } from '../auth/guards/auth.guard';
-import { CreateApplicationDto } from './dtos/requests/create-application.dto';
-import { CreateOrderDto } from './dtos/requests/create-order.dto';
+import { CreateApplicationDto } from './dtos/requests/createApplication.dto';
+import { CreateOrderDto } from './dtos/requests/createOrder.dto';
 import { OrderService } from './order.service';
 
 @Controller('order')
@@ -23,11 +23,11 @@ export class OrderController {
   @Get('/')
   public async getAll(
     @Request() request,
-    @Query('status') status?: OrderStatus,
+    @Query('status') status?: EOrderStatus,
   ) {
     const userId = request.user.userId;
 
-    if (status && !Object.values(OrderStatus).includes(status)) {
+    if (status && !Object.values(EOrderStatus).includes(status)) {
       throw new BadRequestException('Invalid order status');
     }
 

@@ -6,9 +6,9 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { JWTUser } from 'src/shared/types/jwt.type';
 import { Repository } from 'typeorm';
-import { CreateApplicationDto } from '../order/dtos/requests/create-application.dto';
+import { CreateApplicationDto } from '../order/dtos/requests/createApplication.dto';
 import { ApplicationEntity } from './entities/application.entity';
-import { ApplicationStatus } from './enums/application-status.enum';
+import { EApplicationStatus } from './enums/applicationStatus.enum';
 
 @Injectable()
 export class ApplicationService {
@@ -64,7 +64,7 @@ export class ApplicationService {
       ...dto,
       order: { id: orderId },
       cleaner: { id: user.userId },
-      status: ApplicationStatus.CREATED,
+      status: EApplicationStatus.CREATED,
     };
 
     const applicationExists = await this.applicationRepository.findOneBy({

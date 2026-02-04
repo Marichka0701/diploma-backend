@@ -1,4 +1,4 @@
-export enum AuthErrors {
+export enum EAuthErrors {
   WRONG_CREDENTIALS = 'wrong_credentials',
   USER_NOT_FOUND = 'user_not_found',
   USER_PASSWORD_INCORRECT = 'user_password_incorrect',

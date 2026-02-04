@@ -4,10 +4,10 @@ import * as bcrypt from 'bcrypt';
 import { UserService } from 'src/modules/user/user.service';
 import { AUTH_CONSTANTS } from '../../shared/constants/auth.constants';
 import { EUserRole } from '../user/enums/role.enum';
-import { CreateCleanerDto } from './dtos/requests/create-cleaner';
-import { CreateUserDto } from './dtos/requests/create-user.dto';
+import { CreateCleanerDto } from './dtos/requests/createCleaner';
+import { CreateUserDto } from './dtos/requests/createUser.dto';
 import { LoginDto } from './dtos/requests/login.dto';
-import { AuthErrors } from './enums/errors.enum';
+import { EAuthErrors } from './enums/errors.enum';
 
 @Injectable()
 export class AuthService {
@@ -23,7 +23,7 @@ export class AuthService {
 
     const arePasswordsEqual = await bcrypt.compare(dto.password, user.password);
     if (!arePasswordsEqual) {
-      throw new BadRequestException(AuthErrors.WRONG_CREDENTIALS);
+      throw new BadRequestException(EAuthErrors.WRONG_CREDENTIALS);
     }
 
     const tokenPayload = {

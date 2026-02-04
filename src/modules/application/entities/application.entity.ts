@@ -11,7 +11,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { ApplicationStatus } from '../enums/application-status.enum';
+import { EApplicationStatus } from '../enums/applicationStatus.enum';
 
 @Entity('applications')
 export class ApplicationEntity {
@@ -26,10 +26,10 @@ export class ApplicationEntity {
 
   @Column({
     type: 'enum',
-    enum: ApplicationStatus,
-    default: ApplicationStatus.CREATED,
+    enum: EApplicationStatus,
+    default: EApplicationStatus.CREATED,
   })
-  status: ApplicationStatus;
+  status: EApplicationStatus;
 
   @ManyToOne(() => OrderEntity, (order) => order.applications, {
     onDelete: 'CASCADE',

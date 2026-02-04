@@ -4,13 +4,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { OrderStatus } from 'src/shared/enums/order-status.enum';
+import { EOrderStatus } from 'src/modules/order/enums/orderStatus.enum';
 import { JWTUser } from 'src/shared/types/jwt.type';
 import { Repository } from 'typeorm';
 import { ApplicationService } from '../application/application.service';
 import { EUserRole } from '../user/enums/role.enum';
-import { CreateApplicationDto } from './dtos/requests/create-application.dto';
-import { CreateOrderDto } from './dtos/requests/create-order.dto';
+import { CreateApplicationDto } from './dtos/requests/createApplication.dto';
+import { CreateOrderDto } from './dtos/requests/createOrder.dto';
 import { OrderEntity } from './entities/order.entity';
 
 @Injectable()
@@ -23,7 +23,7 @@ export class OrderService {
 
   public async getAllByCurrentUser(
     userId: string,
-    params: { status?: OrderStatus },
+    params: { status?: EOrderStatus },
   ) {
     return await this.orderRepository.findBy({
       user: { id: userId },
@@ -42,7 +42,7 @@ export class OrderService {
     const order = await this.getById(id);
 
     if (
-      order.status !== OrderStatus.CREATED &&
+      order.status !== EOrderStatus.CREATED &&
       order.applications.length === 0
     ) {
       throw new NotFoundException(
@@ -53,7 +53,20 @@ export class OrderService {
     // we can cancel only created orders
     return await this.orderRepository.save({
       ...order,
-      status: OrderStatus.CANCELLED,
+      status: EOrderStatus.CANCELLED,
+    });
+  }
+
+  public async startExecution(id: string) {
+    const order = await this.getById(id);
+
+    if (order.status !== EOrderStatus.CREATED) {
+      throw new BadRequestException('Order status is not CREATED');
+    }
+
+    return await this.orderRepository.save({
+      ...order,
+      status: EOrderStatus.IN_PROGRESS,
     });
   }
 
@@ -74,7 +87,7 @@ export class OrderService {
     }
 
     const order = await this.getById(orderId);
-    if (order.status !== OrderStatus.CREATED) {
+    if (order.status !== EOrderStatus.CREATED) {
       throw new BadRequestException('Order status is not CREATED');
     }
 

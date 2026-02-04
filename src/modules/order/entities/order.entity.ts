@@ -1,7 +1,7 @@
 import { ApplicationEntity } from 'src/modules/application/entities/application.entity';
 import { OfferEntity } from 'src/modules/offer/entities/offer.entity';
+import { EOrderStatus } from 'src/modules/order/enums/orderStatus.enum';
 import { UserEntity } from 'src/modules/user/entities/user.entity';
-import { OrderStatus } from 'src/shared/enums/order-status.enum';
 import {
   Column,
   Entity,
@@ -76,8 +76,8 @@ export class OrderEntity {
   @Column({ type: 'varchar', nullable: true })
   homeAccessAdditionalInstructions?: string;
 
-  @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.CREATED })
-  status: OrderStatus;
+  @Column({ type: 'enum', enum: EOrderStatus, default: EOrderStatus.CREATED })
+  status: EOrderStatus;
 
   @ManyToOne(() => UserEntity, (user) => user.orders)
   @JoinColumn({ name: 'userId' })

@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { EOfferStatus } from '../enums/offerStatus.enum';
 
 @Entity('offers')
 export class OfferEntity {
@@ -22,6 +23,9 @@ export class OfferEntity {
 
   @OneToOne(() => OrderEntity, (order) => order.offer)
   order: OrderEntity;
+
+  @Column({ type: 'enum', enum: EOfferStatus, default: EOfferStatus.CREATED })
+  status: EOfferStatus;
 
   @CreateDateColumn({ name: 'createdAt' })
   createdAt: Date;
