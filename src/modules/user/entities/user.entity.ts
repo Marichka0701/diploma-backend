@@ -38,6 +38,7 @@ export class UserEntity {
   @Column({ type: 'boolean', default: false })
   hasExperience: boolean;
 
+  // TODO: replace with birthdate
   @Column({ type: 'int', nullable: true })
   age: number | null;
 
@@ -61,6 +62,8 @@ export class UserEntity {
 
   @Column({ type: 'boolean', default: false })
   hasInventory: boolean;
+
+  // TODO: add passport images
 
   @OneToMany(() => OrderEntity, (order) => order.user, {
     cascade: true,

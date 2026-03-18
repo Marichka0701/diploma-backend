@@ -68,7 +68,7 @@ export class OrderEntity {
   price: number;
 
   @Column({ type: 'timestamptz' })
-  datetime: Date;
+  datetime: Date;і
 
   @Column({ type: 'varchar' })
   homeAccessInstructions: string;

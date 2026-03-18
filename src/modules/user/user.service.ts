@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { AUTH_CONSTANTS } from 'src/shared/constants/auth.constants';
 import { FindOptionsWhere, Repository } from 'typeorm';
+import { EAuthErrors } from '../auth/enums/errors.enum';
 import { ChangePasswordDto } from './dtos/requests/changePassword.dto';
 import { UserEntity } from './entities/user.entity';
 import { EUserErrors } from './enums/errors.enum';
@@ -47,19 +48,26 @@ export class UserService {
   }
 
   public async createUser(userDto: Partial<UserEntity>): Promise<UserEntity> {
-    const user = this.userRepository.create(userDto);
-    await this.userRepository.save(user);
+    const userExists = await this.userRepository.findOneBy({
+      email: userDto.email,
+    });
+    if (userExists) {
+      throw new BadRequestException(EAuthErrors.USER_ALREADY_EXISTS);
+    }
 
-    return user;
+    const createdUser = this.userRepository.create(userDto);
+    await this.userRepository.save(createdUser);
+
+    return createdUser;
   }
 
   public async createCleaner(
     cleanerDto: Partial<UserEntity>,
   ): Promise<UserEntity> {
-    const cleaner = this.userRepository.create(cleanerDto);
-    await this.userRepository.save(cleaner);
+    const createdCleaner = this.userRepository.create(cleanerDto);
+    await this.userRepository.save(createdCleaner);
 
-    return cleaner;
+    return createdCleaner;
   }
 
   public async changePassword(userId: string, dto: ChangePasswordDto) {

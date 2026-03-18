@@ -5,10 +5,10 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { OrderService } from '../order/order.service';
 import { CreateOfferDto } from './dtos/requests/createOffer';
 import { OfferEntity } from './entities/offer.entity';
 import { EOfferStatus } from './enums/offerStatus.enum';
-import { OrderService } from '../order/order.service';
 
 @Injectable()
 export class OfferService {
@@ -53,6 +53,7 @@ export class OfferService {
       throw new BadRequestException('Offer status is not CREATED');
     }
 
+    await this.orderService.startExecution(offer.application.order.id);
     return await this.offerRepository.save({
       ...offer,
       status: EOfferStatus.ACCEPTED,
@@ -66,7 +67,6 @@ export class OfferService {
       throw new BadRequestException('Offer status is not CREATED');
     }
 
-    await this.orderService.startExecution(offer.application.order.id);
     return await this.offerRepository.save({
       ...offer,
       status: EOfferStatus.DECLINE,
@@ -78,7 +78,7 @@ export class OfferService {
       where: {
         id,
       },
-      relations: ['application', 'application.cleaner'],
+      relations: ['application', 'application.cleaner', 'application.order'],
     });
 
     if (!offer) {

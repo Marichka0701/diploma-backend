@@ -11,6 +11,7 @@ import { ApplicationService } from '../application/application.service';
 import { EUserRole } from '../user/enums/role.enum';
 import { CreateApplicationDto } from './dtos/requests/createApplication.dto';
 import { CreateOrderDto } from './dtos/requests/createOrder.dto';
+import { FinishOrderDto } from './dtos/requests/finishOrder.dto';
 import { OrderEntity } from './entities/order.entity';
 
 @Injectable()
@@ -92,6 +93,27 @@ export class OrderService {
     }
 
     return await this.applicationService.create(orderId, user, dto);
+  }
+
+  public async finishOrder(
+    orderId: string,
+    user: JWTUser,
+    dto: FinishOrderDto,
+  ) {
+    const order = await this.getById(orderId);
+
+    if (order.status !== EOrderStatus.IN_PROGRESS) {
+      throw new BadRequestException('Order status is not IN_PROGRESS');
+    }
+    if (user.userId !== order.cleaner.id) {
+      throw new BadRequestException('You are not a cleaner of this order');
+    }
+
+    return await this.orderRepository.save({
+      ...order,
+      ...dto,
+      status: EOrderStatus.COMPLETED_BY_CLEANER,
+    });
   }
 
   public async getById(id: string) {

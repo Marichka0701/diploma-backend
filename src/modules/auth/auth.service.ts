@@ -31,7 +31,9 @@ export class AuthService {
       email: user.email,
       role: user.role,
     };
-    const accessToken = await this.jwtService.signAsync(tokenPayload);
+    const accessToken = await this.jwtService.signAsync(tokenPayload, {
+      expiresIn: '1d',
+    });
     const refreshToken = await this.jwtService.signAsync(tokenPayload, {
       secret: AUTH_CONSTANTS.REFRESH_SECRET,
       expiresIn: '7d',

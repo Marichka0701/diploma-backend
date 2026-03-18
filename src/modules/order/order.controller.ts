@@ -10,9 +10,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { EOrderStatus } from 'src/modules/order/enums/orderStatus.enum';
+import { RolesGuard } from 'src/shared/guards/roles.guard';
+import { Roles } from 'src/shared/reflectors/roles.reflector';
 import { AuthGuard } from '../auth/guards/auth.guard';
+import { EUserRole } from '../user/enums/role.enum';
 import { CreateApplicationDto } from './dtos/requests/createApplication.dto';
 import { CreateOrderDto } from './dtos/requests/createOrder.dto';
+import { FinishOrderDto } from './dtos/requests/finishOrder.dto';
 import { OrderService } from './order.service';
 
 @Controller('order')
@@ -55,6 +59,8 @@ export class OrderController {
   }
 
   @Post('/:id/application')
+  @UseGuards(RolesGuard)
+  @Roles([EUserRole.CLEANER])
   public async createApplicationForOrderId(
     @Request() request,
     @Param('id') orderId: string,
@@ -67,6 +73,17 @@ export class OrderController {
       user,
       dto,
     );
+  }
+
+  @Post('/:id/finish')
+  public async finishOrder(
+    @Request() request,
+    @Param('id') orderId: string,
+    @Body() dto: FinishOrderDto,
+  ) {
+    const user = request.user;
+
+    return await this.orderService.finishOrder(orderId, user, dto);
   }
 
   @Get('/:id')
