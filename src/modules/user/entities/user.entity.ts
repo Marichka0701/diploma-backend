@@ -38,9 +38,8 @@ export class UserEntity {
   @Column({ type: 'boolean', default: false })
   hasExperience: boolean;
 
-  // TODO: replace with birthdate
-  @Column({ type: 'int', nullable: true })
-  age: number | null;
+  @Column({ type: 'timestamp', nullable: true })
+  birthdayDate: Date | null;
 
   @Column({ type: 'varchar', nullable: true })
   lastWorkedPlace: string | null;
@@ -63,7 +62,11 @@ export class UserEntity {
   @Column({ type: 'boolean', default: false })
   hasInventory: boolean;
 
-  // TODO: add passport images
+  @Column('text', { array: true, default: [] })
+  passportImages: string[];
+
+  @Column({ type: 'varchar', nullable: true })
+  profilePhoto: string | null;
 
   @OneToMany(() => OrderEntity, (order) => order.user, {
     cascade: true,

@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { JWTUser } from 'src/shared/types/jwt.type';
 import { Repository } from 'typeorm';
-import { CreateApplicationDto } from '../order/dtos/requests/createApplication.dto';
+import { CreateApplicationDto } from '../order/dtos/requests/create-application.dto';
 import { ApplicationEntity } from './entities/application.entity';
 import { EApplicationStatus } from './enums/applicationStatus.enum';
 

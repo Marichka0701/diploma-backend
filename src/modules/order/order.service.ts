@@ -9,9 +9,9 @@ import { JWTUser } from 'src/shared/types/jwt.type';
 import { Repository } from 'typeorm';
 import { ApplicationService } from '../application/application.service';
 import { EUserRole } from '../user/enums/role.enum';
-import { CreateApplicationDto } from './dtos/requests/createApplication.dto';
-import { CreateOrderDto } from './dtos/requests/createOrder.dto';
-import { FinishOrderDto } from './dtos/requests/finishOrder.dto';
+import { CreateApplicationDto } from './dtos/requests/create-application.dto';
+import { CreateOrderDto } from './dtos/requests/create-order.dto';
+import { FinishOrderDto } from './dtos/requests/finish-order.dto';
 import { OrderEntity } from './entities/order.entity';
 
 @Injectable()

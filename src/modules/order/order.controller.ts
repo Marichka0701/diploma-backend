@@ -14,9 +14,9 @@ import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { Roles } from 'src/shared/reflectors/roles.reflector';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { EUserRole } from '../user/enums/role.enum';
-import { CreateApplicationDto } from './dtos/requests/createApplication.dto';
-import { CreateOrderDto } from './dtos/requests/createOrder.dto';
-import { FinishOrderDto } from './dtos/requests/finishOrder.dto';
+import { CreateApplicationDto } from './dtos/requests/create-application.dto';
+import { CreateOrderDto } from './dtos/requests/create-order.dto';
+import { FinishOrderDto } from './dtos/requests/finish-order.dto';
 import { OrderService } from './order.service';
 
 @Controller('order')

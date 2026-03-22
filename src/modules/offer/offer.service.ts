@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OrderService } from '../order/order.service';
-import { CreateOfferDto } from './dtos/requests/createOffer';
+import { CreateOfferDto } from './dtos/requests/create-offer';
 import { OfferEntity } from './entities/offer.entity';
 import { EOfferStatus } from './enums/offerStatus.enum';
 

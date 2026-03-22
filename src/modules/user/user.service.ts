@@ -4,7 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { AUTH_CONSTANTS } from 'src/shared/constants/auth.constants';
 import { FindOptionsWhere, Repository } from 'typeorm';
 import { EAuthErrors } from '../auth/enums/errors.enum';
-import { ChangePasswordDto } from './dtos/requests/changePassword.dto';
+import { ChangePasswordDto } from './dtos/requests/change-password.dto';
 import { UserEntity } from './entities/user.entity';
 import { EUserErrors } from './enums/errors.enum';
 

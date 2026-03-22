@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { BaseUserDto } from './baseUser.dto';
+import {
+  IsArray,
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+} from 'class-validator';
+import { BaseUserDto } from './base-user.dto';
 
 export class CreateCleanerDto extends BaseUserDto {
   @ApiProperty()
@@ -24,9 +30,9 @@ export class CreateCleanerDto extends BaseUserDto {
   hasExperience: boolean;
 
   @ApiProperty()
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  age: number;
+  birhdayDate: Date | string;
 
   @ApiProperty()
   @IsString()
@@ -62,4 +68,10 @@ export class CreateCleanerDto extends BaseUserDto {
   @IsBoolean()
   @IsNotEmpty()
   hasInventory: boolean;
+
+  @ApiProperty()
+  @IsArray({ each: true })
+  @IsString({ each: true })
+  @IsNotEmpty()
+  passportImages: string[];
 }

@@ -4,8 +4,8 @@ import * as bcrypt from 'bcrypt';
 import { UserService } from 'src/modules/user/user.service';
 import { AUTH_CONSTANTS } from '../../shared/constants/auth.constants';
 import { EUserRole } from '../user/enums/role.enum';
-import { CreateCleanerDto } from './dtos/requests/createCleaner';
-import { CreateUserDto } from './dtos/requests/createUser.dto';
+import { CreateCleanerDto } from './dtos/requests/create-cleaner.dto';
+import { CreateUserDto } from './dtos/requests/create-user.dto';
 import { LoginDto } from './dtos/requests/login.dto';
 import { EAuthErrors } from './enums/errors.enum';
 

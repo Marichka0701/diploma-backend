@@ -11,7 +11,7 @@ import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { Roles } from 'src/shared/reflectors/roles.reflector';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { EUserRole } from '../user/enums/role.enum';
-import { CreateOfferDto } from './dtos/requests/createOffer';
+import { CreateOfferDto } from './dtos/requests/create-offer';
 import { OfferService } from './offer.service';
 
 @Controller('offer')

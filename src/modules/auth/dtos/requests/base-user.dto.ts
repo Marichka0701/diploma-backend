@@ -24,4 +24,8 @@ export class BaseUserDto {
   @IsNotEmpty()
   @MinLength(8)
   password: string;
+
+  @IsString()
+  @IsNotEmpty()
+  profilePhoto: string;
 }

@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/auth.guard';
-import { ChangePasswordDto } from './dtos/requests/changePassword.dto';
+import { ChangePasswordDto } from './dtos/requests/change-password.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
