@@ -30,7 +30,7 @@ export class UserEntity {
   role: EUserRole;
 
   @Column({ type: 'varchar', nullable: true })
-  cardNumer: string | null;
+  cardNumber: string | null;
 
   @Column({ type: 'varchar', nullable: true })
   city: string;

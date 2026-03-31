@@ -11,7 +11,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { EApplicationStatus } from '../enums/applicationStatus.enum';
+import { EApplicationStatus } from '../enums/application-status.enum';
 
 @Entity('applications')
 export class ApplicationEntity {

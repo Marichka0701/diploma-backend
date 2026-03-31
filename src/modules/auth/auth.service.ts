@@ -1,11 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { UserService } from 'src/modules/user/user.service';
+import { Repository } from 'typeorm';
 import { AUTH_CONSTANTS } from '../../shared/constants/auth.constants';
+import { CreateUserDto } from '../user/dtos/requests/create-user.dto';
+import { UserEntity } from '../user/entities/user.entity';
 import { EUserRole } from '../user/enums/role.enum';
-import { CreateCleanerDto } from './dtos/requests/create-cleaner.dto';
-import { CreateUserDto } from './dtos/requests/create-user.dto';
 import { LoginDto } from './dtos/requests/login.dto';
 import { EAuthErrors } from './enums/errors.enum';
 
@@ -14,9 +16,11 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async login(dto: LoginDto) {
+  public async login(dto: LoginDto) {
     const user = await this.userService.getByParamsOrThrowError({
       email: dto.email,
     });
@@ -43,7 +47,7 @@ export class AuthService {
     return tokenPair;
   }
 
-  async createCleaner(dto: CreateCleanerDto) {
+  public async createCleaner(dto: any) {
     const hashedPassword = await bcrypt.hash(
       dto.password,
       AUTH_CONSTANTS.SALT_ROUNDS,
@@ -55,10 +59,20 @@ export class AuthService {
       role: EUserRole.CLEANER,
     };
 
-    return await this.userService.createCleaner(cleanerDto);
+    const userExists = await this.userRepository.findOneBy({
+      email: dto.email,
+    });
+    if (userExists) {
+      throw new BadRequestException(EAuthErrors.USER_ALREADY_EXISTS);
+    }
+
+    const createdCleaner = this.userRepository.create(cleanerDto);
+    await this.userRepository.save(createdCleaner);
+
+    return createdCleaner;
   }
 
-  async createUser(dto: CreateUserDto) {
+  public async createUser(dto: CreateUserDto) {
     const hashedPassword = await bcrypt.hash(
       dto.password,
       AUTH_CONSTANTS.SALT_ROUNDS,
@@ -70,6 +84,16 @@ export class AuthService {
       role: EUserRole.USER,
     };
 
-    return await this.userService.createUser(userDto);
+    const userExists = await this.userRepository.findOneBy({
+      email: userDto.email,
+    });
+    if (userExists) {
+      throw new BadRequestException(EAuthErrors.USER_ALREADY_EXISTS);
+    }
+
+    const createdUser = this.userRepository.create(userDto);
+    await this.userRepository.save(createdUser);
+
+    return createdUser;
   }
 }

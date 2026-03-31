@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { EOfferStatus } from '../enums/offerStatus.enum';
+import { EOfferStatus } from '../enums/offer-status.enum';
 
 @Entity('offers')
 export class OfferEntity {

@@ -8,7 +8,7 @@ import { JWTUser } from 'src/shared/types/jwt.type';
 import { Repository } from 'typeorm';
 import { CreateApplicationDto } from '../order/dtos/requests/create-application.dto';
 import { ApplicationEntity } from './entities/application.entity';
-import { EApplicationStatus } from './enums/applicationStatus.enum';
+import { EApplicationStatus } from './enums/application-status.enum';
 
 @Injectable()
 export class ApplicationService {
@@ -49,7 +49,7 @@ export class ApplicationService {
         order: { id },
         price: params.price,
       },
-      relations: ['cleaner', 'offer', 'order'],
+      relations: ['cleaner'],
     });
 
     return applications;

@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EOrderStatus } from 'src/modules/order/enums/orderStatus.enum';
+import { EOrderStatus } from 'src/modules/order/enums/order-status.enum';
 import { JWTUser } from 'src/shared/types/jwt.type';
 import { Repository } from 'typeorm';
 import { ApplicationService } from '../application/application.service';

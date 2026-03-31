@@ -1,6 +1,6 @@
 import { ApplicationEntity } from 'src/modules/application/entities/application.entity';
 import { OfferEntity } from 'src/modules/offer/entities/offer.entity';
-import { EOrderStatus } from 'src/modules/order/enums/orderStatus.enum';
+import { EOrderStatus } from 'src/modules/order/enums/order-status.enum';
 import { UserEntity } from 'src/modules/user/entities/user.entity';
 import {
   Column,
@@ -11,7 +11,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { ECleaningType } from '../enums/cleaningType.enum';
+import { ECleaningType } from '../enums/cleaning-type.enum';
 
 @Entity('orders')
 export class OrderEntity {
@@ -68,7 +68,8 @@ export class OrderEntity {
   price: number;
 
   @Column({ type: 'timestamptz' })
-  datetime: Date;і
+  datetime: Date;
+  і;
 
   @Column({ type: 'varchar' })
   homeAccessInstructions: string;

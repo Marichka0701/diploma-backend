@@ -8,7 +8,7 @@ import { Repository } from 'typeorm';
 import { OrderService } from '../order/order.service';
 import { CreateOfferDto } from './dtos/requests/create-offer';
 import { OfferEntity } from './entities/offer.entity';
-import { EOfferStatus } from './enums/offerStatus.enum';
+import { EOfferStatus } from './enums/offer-status.enum';
 
 @Injectable()
 export class OfferService {

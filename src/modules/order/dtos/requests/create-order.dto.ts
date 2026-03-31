@@ -7,7 +7,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { ECleaningType } from '../../enums/cleaningType.enum';
+import { ECleaningType } from '../../enums/cleaning-type.enum';
 
 export class CreateOrderDto {
   @IsString()

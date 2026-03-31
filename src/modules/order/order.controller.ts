@@ -9,7 +9,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { EOrderStatus } from 'src/modules/order/enums/orderStatus.enum';
+import { EOrderStatus } from 'src/modules/order/enums/order-status.enum';
 import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { Roles } from 'src/shared/reflectors/roles.reflector';
 import { AuthGuard } from '../auth/guards/auth.guard';
@@ -39,7 +39,7 @@ export class OrderController {
   }
 
   @Post('/')
-  public async create(@Body() dto: CreateOrderDto, @Request() request) {
+  public async create(@Request() request, @Body() dto: CreateOrderDto) {
     const userId = request.user.userId;
 
     return await this.orderService.create(userId, dto);
