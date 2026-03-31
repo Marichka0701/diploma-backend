@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AdditionalServiceEntity } from 'src/modules/additional-services/entities/additional-service.entity';
 import { ApplicationEntity } from 'src/modules/application/entities/application.entity';
 import { OfferEntity } from 'src/modules/offer/entities/offer.entity';
 import { OrderEntity } from 'src/modules/order/entities/order.entity';
@@ -21,6 +22,7 @@ import { UserEntity } from 'src/modules/user/entities/user.entity';
         ApplicationEntity,
         OfferEntity,
         ServicePackageEntity,
+        AdditionalServiceEntity,
       ],
       synchronize: true,
     }),

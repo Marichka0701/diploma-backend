@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from './core/database/database.module';
+import { AdditionalServicesModule } from './modules/additional-services/additional-services.module';
 import { ApplicationModule } from './modules/application/application.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { FeedbackModule } from './modules/feedback/feedback.module';
@@ -18,6 +19,7 @@ import { UserModule } from './modules/user/user.module';
     OfferModule,
     FeedbackModule,
     ServicePackagesModule,
+    AdditionalServicesModule,
   ],
 })
 export class AppModule {}
