@@ -1,9 +1,10 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateAdditionalServiceDto } from './dtos/requests/create-additional-service';
 import { AdditionalServiceEntity } from './entities/additional-service.entity';
 
+@Injectable()
 export class AdditionalServicesService {
   constructor(
     @InjectRepository(AdditionalServiceEntity)

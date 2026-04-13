@@ -1,15 +1,18 @@
 import { ApplicationEntity } from 'src/modules/application/entities/application.entity';
 import { OfferEntity } from 'src/modules/offer/entities/offer.entity';
 import { EOrderStatus } from 'src/modules/order/enums/order-status.enum';
+import { ServicePackageEntity } from 'src/modules/service-packages/entities/service-package.entity';
 import { UserEntity } from 'src/modules/user/entities/user.entity';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { ECleaningType } from '../enums/cleaning-type.enum';
 
@@ -36,6 +39,10 @@ export class OrderEntity {
   @Column({ type: 'uuid' })
   packageId: string;
 
+  @ManyToOne(() => ServicePackageEntity)
+  @JoinColumn({ name: 'packageId' })
+  package: ServicePackageEntity;
+
   @Column({
     type: 'enum',
     enum: ECleaningType,
@@ -58,10 +65,10 @@ export class OrderEntity {
   @Column({ type: 'int', default: 0 })
   baseRoomsCount?: number;
 
-  @Column({ type: 'uuid', nullable: true })
-  additionalServices?: string[];
+  @Column({ type: 'uuid', array: true, nullable: true })
+  additionalServicesIds?: string[];
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', array: true, nullable: true })
   photos?: string[];
 
   @Column({ type: 'decimal' })
@@ -69,7 +76,6 @@ export class OrderEntity {
 
   @Column({ type: 'timestamptz' })
   datetime: Date;
-  і;
 
   @Column({ type: 'varchar' })
   homeAccessInstructions: string;
@@ -93,4 +99,10 @@ export class OrderEntity {
 
   @OneToOne(() => OfferEntity, (offer) => offer.order, { nullable: true })
   offer: OfferEntity;
+
+  @CreateDateColumn({ name: 'createdAt', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updatedAt', default: () => 'CURRENT_TIMESTAMP' })
+  updatedAt: Date;
 }

@@ -24,25 +24,47 @@ import { OrderService } from './order.service';
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @Get('/')
-  public async getAll(
-    @Request() request,
-    @Query('status') status?: EOrderStatus,
-  ) {
-    const userId = request.user.userId;
-
-    if (status && !Object.values(EOrderStatus).includes(status)) {
-      throw new BadRequestException('Invalid order status');
-    }
-
-    return await this.orderService.getAllByCurrentUser(userId, { status });
-  }
-
   @Post('/')
   public async create(@Request() request, @Body() dto: CreateOrderDto) {
     const userId = request.user.userId;
 
     return await this.orderService.create(userId, dto);
+  }
+
+  @Get('/job-requests')
+  public async getJobRequests(@Request() request) {
+    const cleanerId = request.user.userId;
+    return await this.orderService.getJobRequests(cleanerId, {
+      status: [EOrderStatus.CREATED, EOrderStatus.IN_PROGRESS],
+    });
+  }
+
+  @Get('/current-user')
+  public async getAllByCurrentUser(
+    @Request() request,
+    @Query('status') status?: EOrderStatus | EOrderStatus[],
+  ) {
+    const userId = request.user.userId;
+
+    const statuses = Array.isArray(status)
+      ? status
+      : status
+        ? [status]
+        : undefined;
+
+    if (statuses) {
+      const isValid = statuses.every((s) =>
+        Object.values(EOrderStatus).includes(s),
+      );
+
+      if (!isValid) {
+        throw new BadRequestException('Invalid order status');
+      }
+    }
+
+    return await this.orderService.getAllByCurrentUser(userId, {
+      status: statuses,
+    });
   }
 
   @Post('/:id/cancel')

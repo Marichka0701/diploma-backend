@@ -1,8 +1,10 @@
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateServicePackageDto } from './dtos/requests/create-service-package';
 import { ServicePackageEntity } from './entities/service-package.entity';
 
+@Injectable()
 export class ServicePackagesService {
   constructor(
     @InjectRepository(ServicePackageEntity)

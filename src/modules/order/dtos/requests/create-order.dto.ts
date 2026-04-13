@@ -60,7 +60,7 @@ export class CreateOrderDto {
 
   @IsArray()
   @IsOptional()
-  additionalServices?: string[];
+  additionalServicesIds?: string[];
 
   @IsArray()
   @IsOptional()

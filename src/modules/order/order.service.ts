@@ -6,7 +6,8 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { EOrderStatus } from 'src/modules/order/enums/order-status.enum';
 import { JWTUser } from 'src/shared/types/jwt.type';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
+import { AdditionalServiceEntity } from '../additional-services/entities/additional-service.entity';
 import { ApplicationService } from '../application/application.service';
 import { EUserRole } from '../user/enums/role.enum';
 import { CreateApplicationDto } from './dtos/requests/create-application.dto';
@@ -20,16 +21,67 @@ export class OrderService {
     private readonly applicationService: ApplicationService,
     @InjectRepository(OrderEntity)
     private readonly orderRepository: Repository<OrderEntity>,
+    @InjectRepository(AdditionalServiceEntity)
+    private readonly additionalServiceRepository: Repository<AdditionalServiceEntity>,
   ) {}
+
+  public async getJobRequests(
+    cleanerId: string,
+    params: { status?: EOrderStatus[] },
+  ) {
+    const queryBuilder = this.orderRepository
+      .createQueryBuilder('order')
+      .leftJoinAndSelect('order.applications', 'application')
+      .where(
+        `NOT EXISTS (
+          SELECT 1 FROM applications a
+          WHERE a."orderId" = order.id AND a."cleanerId" = :cleanerId
+        )`,
+        { cleanerId },
+      );
+
+    if (params.status) {
+      queryBuilder.andWhere('order.status IN (:...statuses)', {
+        statuses: params.status,
+      });
+    }
+
+    return await queryBuilder.getMany();
+  }
 
   public async getAllByCurrentUser(
     userId: string,
-    params: { status?: EOrderStatus },
+    params: { status?: EOrderStatus[] },
   ) {
-    return await this.orderRepository.findBy({
-      user: { id: userId },
-      status: params.status,
+    const orders = await this.orderRepository.find({
+      where: {
+        user: { id: userId },
+        ...(params.status && {
+          status: In(params.status),
+        }),
+      },
+      relations: {
+        package: true,
+        applications: true,
+      },
     });
+
+    const additionalServiceIds = [
+      ...new Set(orders.flatMap((o) => o.additionalServicesIds ?? [])),
+    ];
+
+    const additionalServices = additionalServiceIds.length
+      ? await this.additionalServiceRepository.find({
+          where: { id: In(additionalServiceIds) },
+        })
+      : [];
+
+    return orders.map((order) => ({
+      ...order,
+      additionalServices: additionalServices.filter((s) =>
+        order.additionalServicesIds?.includes(s.id),
+      ),
+    }));
   }
 
   public async create(userId: string, dto: CreateOrderDto) {
@@ -117,7 +169,12 @@ export class OrderService {
   }
 
   public async getById(id: string) {
-    const order = await this.orderRepository.findOneBy({ id });
+    const order = await this.orderRepository.findOne({
+      where: { id },
+      relations: {
+        package: true,
+      },
+    });
 
     if (!order) {
       throw new NotFoundException('Order not found');

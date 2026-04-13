@@ -68,6 +68,7 @@ export class ApplicationService {
     };
 
     const applicationExists = await this.applicationRepository.findOneBy({
+      order: { id: orderId },
       cleaner: { id: user.userId },
     });
     if (applicationExists) {
