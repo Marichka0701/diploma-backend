@@ -1,0 +1,1 @@
+export const CLEANER_COMMISSION_RATE = 0.18;

@@ -17,6 +17,8 @@ import { EUserRole } from '../user/enums/role.enum';
 import { CreateApplicationDto } from './dtos/requests/create-application.dto';
 import { CreateOrderDto } from './dtos/requests/create-order.dto';
 import { FinishOrderDto } from './dtos/requests/finish-order.dto';
+import { GetEarningsDto } from './dtos/requests/get-earnings.dto';
+import { GetHistoryDto } from './dtos/requests/get-history.dto';
 import { OrderService } from './order.service';
 
 @Controller('order')
@@ -49,6 +51,31 @@ export class OrderController {
       servicePackage,
       additionalServices,
     });
+  }
+
+  @Get('/history/earnings')
+  @UseGuards(RolesGuard)
+  @Roles([EUserRole.CLEANER])
+  public async getHistoryEarnings(
+    @Request() request,
+    @Query() query: GetEarningsDto,
+  ) {
+    const cleanerId = request.user.userId;
+    return await this.orderService.getEarningsForCleaner(
+      cleanerId,
+      query.month,
+    );
+  }
+
+  @Get('/history')
+  @UseGuards(RolesGuard)
+  @Roles([EUserRole.CLEANER])
+  public async getHistory(
+    @Request() request,
+    @Query() query: GetHistoryDto,
+  ) {
+    const cleanerId = request.user.userId;
+    return await this.orderService.getHistoryForCleaner(cleanerId, query);
   }
 
   @Get('/current-user')
@@ -122,7 +149,7 @@ export class OrderController {
   }
 
   @Get('/:id')
-  public async getById(@Param('id') id: string) {
-    return await this.orderService.getById(id);
+  public async getById(@Request() request, @Param('id') id: string) {
+    return await this.orderService.getByIdForCaller(id, request.user);
   }
 }

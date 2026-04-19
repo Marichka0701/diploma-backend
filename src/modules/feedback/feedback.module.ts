@@ -1,9 +1,14 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { OrderEntity } from '../order/entities/order.entity';
+import { FeedbackEntity } from './entities/feedback.entity';
 import { FeedbackController } from './feedback.controller';
 import { FeedbackService } from './feedback.service';
 
 @Module({
+  imports: [TypeOrmModule.forFeature([FeedbackEntity, OrderEntity])],
   controllers: [FeedbackController],
-  providers: [FeedbackService]
+  providers: [FeedbackService],
+  exports: [FeedbackService],
 })
 export class FeedbackModule {}
