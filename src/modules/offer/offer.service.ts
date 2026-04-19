@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ApplicationEntity } from '../application/entities/application.entity';
 import { OrderService } from '../order/order.service';
 import { CreateOfferDto } from './dtos/requests/create-offer';
 import { OfferEntity } from './entities/offer.entity';
@@ -16,6 +17,8 @@ export class OfferService {
     private readonly orderService: OrderService,
     @InjectRepository(OfferEntity)
     private readonly offerRepository: Repository<OfferEntity>,
+    @InjectRepository(ApplicationEntity)
+    private readonly applicationRepository: Repository<ApplicationEntity>,
   ) {}
 
   public async getAllByCurrentCleaner(userId: string) {
@@ -26,8 +29,16 @@ export class OfferService {
             id: userId,
           },
         },
+        status: EOfferStatus.CREATED,
       },
-      relations: ['application', 'application.cleaner'],
+      relations: [
+        'application',
+        'application.cleaner',
+        'application.order',
+        'application.order.user',
+        'application.order.package',
+        'application.order.additionalServices',
+      ],
     });
   }
 
@@ -40,10 +51,25 @@ export class OfferService {
       throw new BadRequestException('Offer already exists');
     }
 
-    return await this.offerRepository.save({
-      applicationId: dto.applicationId,
-      application: { id: dto.applicationId },
+    const application = await this.applicationRepository.findOne({
+      where: { id: dto.applicationId },
+      relations: ['order'],
     });
+
+    if (!application) {
+      throw new NotFoundException('Application not found');
+    }
+
+    const savedOffer = await this.offerRepository.save({
+      applicationId: dto.applicationId,
+      orderId: application.order.id,
+    });
+
+    await this.applicationRepository.update(dto.applicationId, {
+      offer: { id: savedOffer.id },
+    });
+
+    return savedOffer;
   }
 
   public async acceptOffer(id: string) {
@@ -78,7 +104,12 @@ export class OfferService {
       where: {
         id,
       },
-      relations: ['application', 'application.cleaner', 'application.order'],
+      relations: [
+        'application',
+        'application.cleaner',
+        'application.order',
+        'application.order.user',
+      ],
     });
 
     if (!offer) {

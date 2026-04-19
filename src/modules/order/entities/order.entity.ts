@@ -1,3 +1,4 @@
+import { AdditionalServiceEntity } from 'src/modules/additional-services/entities/additional-service.entity';
 import { ApplicationEntity } from 'src/modules/application/entities/application.entity';
 import { OfferEntity } from 'src/modules/offer/entities/offer.entity';
 import { EOrderStatus } from 'src/modules/order/enums/order-status.enum';
@@ -8,6 +9,8 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   OneToOne,
@@ -67,6 +70,10 @@ export class OrderEntity {
 
   @Column({ type: 'uuid', array: true, nullable: true })
   additionalServicesIds?: string[];
+
+  @ManyToMany(() => AdditionalServiceEntity)
+  @JoinTable()
+  additionalServices: AdditionalServiceEntity[];
 
   @Column({ type: 'varchar', array: true, nullable: true })
   photos?: string[];

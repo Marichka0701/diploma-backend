@@ -27,11 +27,21 @@ export class OrderService {
 
   public async getJobRequests(
     cleanerId: string,
-    params: { status?: EOrderStatus[] },
+    params: {
+      status?: EOrderStatus[];
+      priceFrom?: number;
+      priceTo?: number;
+      servicePackage?: string;
+      additionalServices?: string[];
+    },
   ) {
     const queryBuilder = this.orderRepository
       .createQueryBuilder('order')
       .leftJoinAndSelect('order.applications', 'application')
+      .leftJoinAndSelect('order.package', 'package')
+      .leftJoinAndSelect('order.additionalServices', 'additionalServices')
+      .leftJoin('order.user', 'user')
+      .addSelect(['user.id', 'user.firstName', 'user.lastName'])
       .where(
         `NOT EXISTS (
           SELECT 1 FROM applications a
@@ -45,48 +55,80 @@ export class OrderService {
         statuses: params.status,
       });
     }
+    if (params.priceFrom) {
+      queryBuilder.andWhere('order.price >= :priceFrom', {
+        priceFrom: Number(params.priceFrom),
+      });
+    }
+    if (params.priceTo) {
+      queryBuilder.andWhere('order.price <= :priceTo', {
+        priceTo: Number(params.priceTo),
+      });
+    }
+    if (params.servicePackage) {
+      queryBuilder.andWhere('order.packageId = :servicePackage', {
+        servicePackage: params.servicePackage,
+      });
+    }
+    if (params.additionalServices) {
+      const services = Array.isArray(params.additionalServices)
+        ? params.additionalServices
+        : [params.additionalServices];
+      queryBuilder.andWhere(
+        'order.additionalServicesIds @> :additionalServices',
+        {
+          additionalServices: services,
+        },
+      );
+    }
 
     return await queryBuilder.getMany();
   }
 
   public async getAllByCurrentUser(
     userId: string,
+    role: EUserRole,
     params: { status?: EOrderStatus[] },
   ) {
-    const orders = await this.orderRepository.find({
+    return await this.orderRepository.find({
       where: {
-        user: { id: userId },
+        ...(role === EUserRole.USER && { user: { id: userId } }),
         ...(params.status && {
           status: In(params.status),
         }),
+        ...(role === EUserRole.CLEANER && {
+          offer: {
+            application: {
+              cleaner: {
+                id: userId,
+              },
+            },
+          },
+        }),
       },
-      relations: {
-        package: true,
-        applications: true,
-      },
+      relations: [
+        'applications',
+        'package',
+        'offer',
+        'offer.application',
+        'offer.application.cleaner',
+        'user',
+      ],
     });
-
-    const additionalServiceIds = [
-      ...new Set(orders.flatMap((o) => o.additionalServicesIds ?? [])),
-    ];
-
-    const additionalServices = additionalServiceIds.length
-      ? await this.additionalServiceRepository.find({
-          where: { id: In(additionalServiceIds) },
-        })
-      : [];
-
-    return orders.map((order) => ({
-      ...order,
-      additionalServices: additionalServices.filter((s) =>
-        order.additionalServicesIds?.includes(s.id),
-      ),
-    }));
   }
 
   public async create(userId: string, dto: CreateOrderDto) {
+    let additionalServices: AdditionalServiceEntity[] = [];
+
+    if (dto.additionalServicesIds?.length) {
+      additionalServices = await this.additionalServiceRepository.findBy({
+        id: In(dto.additionalServicesIds),
+      });
+    }
+
     return await this.orderRepository.save({
       ...dto,
+      additionalServices,
       user: { id: userId },
     });
   }
@@ -171,9 +213,7 @@ export class OrderService {
   public async getById(id: string) {
     const order = await this.orderRepository.findOne({
       where: { id },
-      relations: {
-        package: true,
-      },
+      relations: ['package', 'additionalServices', 'offer'],
     });
 
     if (!order) {

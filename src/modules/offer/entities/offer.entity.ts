@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -16,13 +17,18 @@ export class OfferEntity {
   id: string;
 
   @OneToOne(() => ApplicationEntity, (application) => application.offer)
+  @JoinColumn({ name: 'applicationId' })
   application: ApplicationEntity;
 
   @Column({ type: 'uuid' })
   applicationId: string;
 
   @OneToOne(() => OrderEntity, (order) => order.offer)
+  @JoinColumn({ name: 'orderId' })
   order: OrderEntity;
+
+  @Column({ type: 'uuid', nullable: true })
+  orderId: string;
 
   @Column({ type: 'enum', enum: EOfferStatus, default: EOfferStatus.CREATED })
   status: EOfferStatus;

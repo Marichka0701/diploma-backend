@@ -32,10 +32,22 @@ export class OrderController {
   }
 
   @Get('/job-requests')
-  public async getJobRequests(@Request() request) {
+  @UseGuards(RolesGuard)
+  @Roles([EUserRole.CLEANER])
+  public async getJobRequests(
+    @Request() request,
+    @Query('priceFrom') priceFrom?: number,
+    @Query('priceTo') priceTo?: number,
+    @Query('servicePackage') servicePackage?: string,
+    @Query('additionalServices') additionalServices?: string[],
+  ) {
     const cleanerId = request.user.userId;
     return await this.orderService.getJobRequests(cleanerId, {
       status: [EOrderStatus.CREATED, EOrderStatus.IN_PROGRESS],
+      priceFrom,
+      priceTo,
+      servicePackage,
+      additionalServices,
     });
   }
 
@@ -45,6 +57,7 @@ export class OrderController {
     @Query('status') status?: EOrderStatus | EOrderStatus[],
   ) {
     const userId = request.user.userId;
+    const role = request.user.role;
 
     const statuses = Array.isArray(status)
       ? status
@@ -62,7 +75,7 @@ export class OrderController {
       }
     }
 
-    return await this.orderService.getAllByCurrentUser(userId, {
+    return await this.orderService.getAllByCurrentUser(userId, role, {
       status: statuses,
     });
   }

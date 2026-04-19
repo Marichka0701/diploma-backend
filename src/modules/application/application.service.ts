@@ -49,10 +49,16 @@ export class ApplicationService {
         order: { id },
         price: params.price,
       },
-      relations: ['cleaner'],
+      relations: [
+        'cleaner',
+        'offer',
+      ],
     });
 
-    return applications;
+    return applications.map((application) => ({
+      ...application,
+      isApplied: !!application?.offer,
+    }));
   }
 
   public async create(
