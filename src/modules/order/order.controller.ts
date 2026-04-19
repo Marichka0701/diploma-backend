@@ -14,6 +14,7 @@ import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { Roles } from 'src/shared/reflectors/roles.reflector';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { EUserRole } from '../user/enums/role.enum';
+import { GetApplicationsByOrderDto } from '../application/dtos/requests/get-applications-by-order.dto';
 import { CreateApplicationDto } from './dtos/requests/create-application.dto';
 import { CreateOrderDto } from './dtos/requests/create-order.dto';
 import { FinishOrderDto } from './dtos/requests/finish-order.dto';
@@ -115,9 +116,9 @@ export class OrderController {
   @Get('/:id/applications')
   public async getAllApplicationsByOrderId(
     @Param('id') id: string,
-    @Query('price') price?: number,
+    @Query() query: GetApplicationsByOrderDto,
   ) {
-    return await this.orderService.getAllApplicationsByOrderId(id, { price });
+    return await this.orderService.getAllApplicationsByOrderId(id, query);
   }
 
   @Post('/:id/application')

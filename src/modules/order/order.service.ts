@@ -10,6 +10,7 @@ import { JWTUser } from 'src/shared/types/jwt.type';
 import { In, Repository } from 'typeorm';
 import { AdditionalServiceEntity } from '../additional-services/entities/additional-service.entity';
 import { ApplicationService } from '../application/application.service';
+import { GetApplicationsByOrderDto } from '../application/dtos/requests/get-applications-by-order.dto';
 import { ApplicationEntity } from '../application/entities/application.entity';
 import { FeedbackEntity } from '../feedback/entities/feedback.entity';
 import { OfferEntity } from '../offer/entities/offer.entity';
@@ -408,7 +409,7 @@ export class OrderService {
 
   public async getAllApplicationsByOrderId(
     id: string,
-    params: { price?: number },
+    params: GetApplicationsByOrderDto,
   ) {
     return await this.applicationService.getAllByOrderId(id, params);
   }
