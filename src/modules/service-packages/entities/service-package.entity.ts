@@ -17,6 +17,12 @@ export class ServicePackageEntity {
   @Column({ type: 'int' })
   price: number;
 
+  @Column({ type: 'int', nullable: true })
+  minArea: number | null;
+
+  @Column({ type: 'int', nullable: true })
+  maxArea: number | null;
+
   @Column('varchar', { array: true })
   services: string[];
 

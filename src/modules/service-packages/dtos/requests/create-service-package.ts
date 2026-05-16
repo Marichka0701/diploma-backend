@@ -1,5 +1,12 @@
 import { Transform } from 'class-transformer';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
 
 export class CreateServicePackageDto {
   @IsString()
@@ -10,6 +17,22 @@ export class CreateServicePackageDto {
   @IsNotEmpty()
   @Transform(({ value }) => Number(value))
   price: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Transform(({ value }) =>
+    value === null || value === undefined ? value : Number(value),
+  )
+  minArea?: number | null;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Transform(({ value }) =>
+    value === null || value === undefined ? value : Number(value),
+  )
+  maxArea?: number | null;
 
   @IsString({ each: true })
   @IsNotEmpty()

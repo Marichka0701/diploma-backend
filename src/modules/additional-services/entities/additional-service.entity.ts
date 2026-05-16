@@ -6,6 +6,11 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+export enum AdditionalServicePricingUnit {
+  Fixed = 'fixed',
+  PerHour = 'per_hour',
+}
+
 @Entity('additional_services')
 export class AdditionalServiceEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -19,6 +24,13 @@ export class AdditionalServiceEntity {
 
   @Column({ type: 'varchar' })
   icon: string;
+
+  @Column({
+    type: 'enum',
+    enum: AdditionalServicePricingUnit,
+    default: AdditionalServicePricingUnit.Fixed,
+  })
+  pricingUnit: AdditionalServicePricingUnit;
 
   @CreateDateColumn({ name: 'createdAt' })
   createdAt: Date;
