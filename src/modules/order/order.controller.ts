@@ -149,6 +149,19 @@ export class OrderController {
     return await this.orderService.finishOrder(orderId, user, dto);
   }
 
+  @Post('/:id/mark-complete')
+  @UseGuards(RolesGuard)
+  @Roles([EUserRole.CLEANER])
+  public async markCompletedByCleaner(
+    @Request() request,
+    @Param('id') orderId: string,
+  ) {
+    return await this.orderService.markCompletedByCleaner(
+      orderId,
+      request.user,
+    );
+  }
+
   @Get('/:id')
   public async getById(@Request() request, @Param('id') id: string) {
     return await this.orderService.getByIdForCaller(id, request.user);

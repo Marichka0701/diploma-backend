@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -381,14 +382,24 @@ export class OrderService {
   }
 
   public async cancel(id: string) {
-    const order = await this.getById(id);
+    const order = await this.orderRepository.findOne({
+      where: { id },
+      relations: ['applications'],
+    });
 
-    if (
-      order.status !== EOrderStatus.CREATED &&
-      order.applications.length === 0
-    ) {
-      throw new NotFoundException(
-        'Only orders with CREATED status can be cancelled and without applications',
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    if (order.status !== EOrderStatus.CREATED) {
+      throw new BadRequestException(
+        'Only orders with CREATED status can be cancelled',
+      );
+    }
+
+    if (order.applications.length > 0) {
+      throw new BadRequestException(
+        'Cannot cancel an order that already has applications',
       );
     }
 
@@ -448,11 +459,16 @@ export class OrderService {
     if (!order) {
       throw new NotFoundException('Order not found');
     }
-    if (order.status !== EOrderStatus.IN_PROGRESS) {
-      throw new BadRequestException('Order status is not IN_PROGRESS');
+    if (
+      order.status !== EOrderStatus.IN_PROGRESS &&
+      order.status !== EOrderStatus.COMPLETED_BY_CLEANER
+    ) {
+      throw new BadRequestException(
+        'Order must be IN_PROGRESS or COMPLETED_BY_CLEANER to be finished',
+      );
     }
     if (user.userId !== order.user?.id) {
-      throw new BadRequestException('You are not the owner of this order');
+      throw new ForbiddenException('You are not the owner of this order');
     }
 
     const assignedCleanerId = order.offer?.application?.cleaner?.id;
@@ -474,6 +490,39 @@ export class OrderService {
     });
 
     return updatedOrder;
+  }
+
+  public async markCompletedByCleaner(orderId: string, user: JWTUser) {
+    if (user.role !== EUserRole.CLEANER) {
+      throw new ForbiddenException('Only cleaners can mark an order completed');
+    }
+
+    const order = await this.orderRepository.findOne({
+      where: { id: orderId },
+      relations: ['offer', 'offer.application', 'offer.application.cleaner'],
+    });
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+    if (order.status !== EOrderStatus.IN_PROGRESS) {
+      throw new BadRequestException('Order status is not IN_PROGRESS');
+    }
+
+    const assignedCleanerId = order.offer?.application?.cleaner?.id;
+    if (!assignedCleanerId) {
+      throw new BadRequestException('Order has no assigned cleaner');
+    }
+    if (assignedCleanerId !== user.userId) {
+      throw new ForbiddenException(
+        'You are not the assigned cleaner for this order',
+      );
+    }
+
+    return await this.orderRepository.save({
+      ...order,
+      status: EOrderStatus.COMPLETED_BY_CLEANER,
+    });
   }
 
   public async getById(id: string) {
