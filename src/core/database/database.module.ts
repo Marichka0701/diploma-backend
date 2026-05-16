@@ -12,11 +12,11 @@ import { UserEntity } from 'src/modules/user/entities/user.entity';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'diploma_user',
-      password: '12345',
-      database: 'dev',
+      host: process.env.DB_HOST ?? 'localhost',
+      port: parseInt(process.env.DB_PORT ?? '5432', 10),
+      username: process.env.DB_USERNAME ?? 'diploma_user',
+      password: process.env.DB_PASSWORD ?? '12345',
+      database: process.env.DB_NAME ?? 'dev',
       entities: [
         UserEntity,
         OrderEntity,

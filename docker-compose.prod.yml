@@ -1,0 +1,9 @@
+services:
+  api:
+    build:
+      context: .
+      target: prod
+    environment:
+      NODE_ENV: production
+    volumes:
+      - ./uploads:/app/uploads

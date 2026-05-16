@@ -1,9 +1,9 @@
-import { IsDecimal, IsNotEmpty, IsString, Max, Min } from 'class-validator';
+import { IsInt, IsNotEmpty, IsString, Max, Min } from 'class-validator';
 
 export class FinishOrderDto {
   @IsNotEmpty()
-  @IsDecimal()
-  @Min(0)
+  @IsInt()
+  @Min(1)
   @Max(5)
   rating: number;
 

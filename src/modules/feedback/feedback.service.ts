@@ -30,7 +30,7 @@ export class FeedbackService {
   public async create(authorId: string, dto: CreateFeedbackDto) {
     const order = await this.orderRepository.findOne({
       where: { id: dto.orderId },
-      relations: ['user', 'cleaner'],
+      relations: ['user', 'offer', 'offer.application', 'offer.application.cleaner'],
     });
 
     if (!order) {
@@ -44,7 +44,7 @@ export class FeedbackService {
     }
 
     const customerId = order.user?.id;
-    const cleanerId = order.cleaner?.id;
+    const cleanerId = order.offer?.application?.cleaner?.id;
     let recipientId: string;
 
     if (customerId && authorId === customerId) {

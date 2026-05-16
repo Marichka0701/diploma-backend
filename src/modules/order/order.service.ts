@@ -36,7 +36,11 @@ const NON_PAYING_STATUSES: EOrderStatus[] = [
   EOrderStatus.EXPIRED,
 ];
 
-const PAID_OUT_STATUS = EOrderStatus.DONE;
+const EARNED_STATUSES: EOrderStatus[] = [
+  EOrderStatus.COMPLETED_BY_CLEANER,
+  EOrderStatus.COMPLETED_BY_USER,
+  EOrderStatus.DONE,
+];
 
 type EarningsBlock = {
   gross: number;
@@ -337,11 +341,11 @@ export class OrderService {
         { cleanerId },
       )
       .innerJoin(OfferEntity, 'ofr', 'ofr."applicationId" = app.id')
-      .where('order.status = :status', { status: PAID_OUT_STATUS })
-      .andWhere('order.datetime >= :start AND order.datetime < :end', {
-        start,
-        end,
-      })
+      .where('order.status IN (:...statuses)', { statuses: EARNED_STATUSES })
+      .andWhere(
+        '"order"."updatedAt" >= :start AND "order"."updatedAt" < :end',
+        { start, end },
+      )
       .select('app.price', 'price')
       .getRawMany<{ price: string }>();
 
@@ -436,20 +440,40 @@ export class OrderService {
     user: JWTUser,
     dto: FinishOrderDto,
   ) {
-    const order = await this.getById(orderId);
+    const order = await this.orderRepository.findOne({
+      where: { id: orderId },
+      relations: ['offer', 'offer.application', 'offer.application.cleaner', 'user'],
+    });
 
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
     if (order.status !== EOrderStatus.IN_PROGRESS) {
       throw new BadRequestException('Order status is not IN_PROGRESS');
     }
-    if (user.userId !== order.cleaner.id) {
-      throw new BadRequestException('You are not a cleaner of this order');
+    if (user.userId !== order.user?.id) {
+      throw new BadRequestException('You are not the owner of this order');
     }
 
-    return await this.orderRepository.save({
+    const assignedCleanerId = order.offer?.application?.cleaner?.id;
+    if (!assignedCleanerId) {
+      throw new BadRequestException('Order has no assigned cleaner');
+    }
+
+    const updatedOrder = await this.orderRepository.save({
       ...order,
-      ...dto,
-      status: EOrderStatus.COMPLETED_BY_CLEANER,
+      status: EOrderStatus.COMPLETED_BY_USER,
     });
+
+    await this.feedbackRepository.save({
+      orderId,
+      authorId: user.userId,
+      recipientId: assignedCleanerId,
+      rating: dto.rating,
+      comment: dto.feedback ?? null,
+    });
+
+    return updatedOrder;
   }
 
   public async getById(id: string) {
