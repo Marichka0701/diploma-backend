@@ -8,6 +8,7 @@ import { OrderEntity } from '../order/entities/order.entity';
 import { OrderService } from '../order/order.service';
 import { OfferEntity } from './entities/offer.entity';
 import { OfferController } from './offer.controller';
+import { OfferSchedulerService } from './offer.scheduler';
 import { OfferService } from './offer.service';
 
 @Module({
@@ -20,7 +21,12 @@ import { OfferService } from './offer.service';
       FeedbackEntity,
     ]),
   ],
-  providers: [OfferService, OrderService, ApplicationService],
+  providers: [
+    OfferService,
+    OrderService,
+    ApplicationService,
+    OfferSchedulerService,
+  ],
   controllers: [OfferController],
 })
 export class OfferModule {}

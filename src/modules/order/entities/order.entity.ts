@@ -13,7 +13,6 @@ import {
   ManyToMany,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -104,8 +103,8 @@ export class OrderEntity {
   @OneToMany(() => ApplicationEntity, (application) => application.order)
   applications: ApplicationEntity[];
 
-  @OneToOne(() => OfferEntity, (offer) => offer.order, { nullable: true })
-  offer: OfferEntity;
+  @OneToMany(() => OfferEntity, (offer) => offer.order)
+  offers: OfferEntity[];
 
   @CreateDateColumn({ name: 'createdAt', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

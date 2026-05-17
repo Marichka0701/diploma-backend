@@ -15,6 +15,7 @@ import { GetApplicationsByOrderDto } from '../application/dtos/requests/get-appl
 import { ApplicationEntity } from '../application/entities/application.entity';
 import { FeedbackEntity } from '../feedback/entities/feedback.entity';
 import { OfferEntity } from '../offer/entities/offer.entity';
+import { EOfferStatus } from '../offer/enums/offer-status.enum';
 import { EUserRole } from '../user/enums/role.enum';
 import { CreateApplicationDto } from './dtos/requests/create-application.dto';
 import { CreateOrderDto } from './dtos/requests/create-order.dto';
@@ -136,7 +137,8 @@ export class OrderService {
           status: In(params.status),
         }),
         ...(role === EUserRole.CLEANER && {
-          offer: {
+          offers: {
+            status: EOfferStatus.ACCEPTED,
             application: {
               cleaner: {
                 id: userId,
@@ -148,9 +150,9 @@ export class OrderService {
       relations: [
         'applications',
         'package',
-        'offer',
-        'offer.application',
-        'offer.application.cleaner',
+        'offers',
+        'offers.application',
+        'offers.application.cleaner',
         'user',
       ],
     });
@@ -453,7 +455,12 @@ export class OrderService {
   ) {
     const order = await this.orderRepository.findOne({
       where: { id: orderId },
-      relations: ['offer', 'offer.application', 'offer.application.cleaner', 'user'],
+      relations: [
+        'offers',
+        'offers.application',
+        'offers.application.cleaner',
+        'user',
+      ],
     });
 
     if (!order) {
@@ -471,7 +478,7 @@ export class OrderService {
       throw new ForbiddenException('You are not the owner of this order');
     }
 
-    const assignedCleanerId = order.offer?.application?.cleaner?.id;
+    const assignedCleanerId = this.getAssignedCleanerId(order);
     if (!assignedCleanerId) {
       throw new BadRequestException('Order has no assigned cleaner');
     }
@@ -499,7 +506,7 @@ export class OrderService {
 
     const order = await this.orderRepository.findOne({
       where: { id: orderId },
-      relations: ['offer', 'offer.application', 'offer.application.cleaner'],
+      relations: ['offers', 'offers.application', 'offers.application.cleaner'],
     });
 
     if (!order) {
@@ -509,7 +516,7 @@ export class OrderService {
       throw new BadRequestException('Order status is not IN_PROGRESS');
     }
 
-    const assignedCleanerId = order.offer?.application?.cleaner?.id;
+    const assignedCleanerId = this.getAssignedCleanerId(order);
     if (!assignedCleanerId) {
       throw new BadRequestException('Order has no assigned cleaner');
     }
@@ -528,7 +535,7 @@ export class OrderService {
   public async getById(id: string) {
     const order = await this.orderRepository.findOne({
       where: { id },
-      relations: ['package', 'additionalServices', 'offer'],
+      relations: ['package', 'additionalServices', 'offers'],
     });
 
     if (!order) {
@@ -541,7 +548,7 @@ export class OrderService {
   public async getByIdForCaller(id: string, caller: JWTUser) {
     const order = await this.orderRepository.findOne({
       where: { id },
-      relations: ['package', 'additionalServices', 'offer', 'user'],
+      relations: ['package', 'additionalServices', 'offers', 'user'],
     });
 
     if (!order) {
@@ -579,6 +586,14 @@ export class OrderService {
         : null,
       earnings,
     };
+  }
+
+  private getAssignedCleanerId(order: OrderEntity): string | undefined {
+    const offers: OfferEntity[] = order.offers ?? [];
+    const accepted = offers.find(
+      (o: OfferEntity) => o.status === EOfferStatus.ACCEPTED,
+    );
+    return accepted?.application?.cleaner?.id;
   }
 
   private computeEarnings(price: number, status: EOrderStatus): EarningsBlock {

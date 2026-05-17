@@ -31,22 +31,29 @@ export class OfferController {
   @Post('/')
   @Roles([EUserRole.USER])
   @UseGuards(RolesGuard)
-  public async create(@Body() dto: CreateOfferDto) {
-    return await this.offerService.create(dto);
+  public async create(@Request() request, @Body() dto: CreateOfferDto) {
+    return await this.offerService.create(dto, request.user.userId);
   }
 
   @Post('/:id/accept')
   @Roles([EUserRole.CLEANER])
   @UseGuards(RolesGuard)
-  public async acceptOffer(@Param('id') id: string) {
-    return await this.offerService.acceptOffer(id);
+  public async acceptOffer(@Request() request, @Param('id') id: string) {
+    return await this.offerService.acceptOffer(id, request.user.userId);
   }
 
   @Post('/:id/decline')
   @Roles([EUserRole.CLEANER])
   @UseGuards(RolesGuard)
-  public async declineOffer(@Param('id') id: string) {
-    return await this.offerService.declineOffer(id);
+  public async declineOffer(@Request() request, @Param('id') id: string) {
+    return await this.offerService.declineOffer(id, request.user.userId);
+  }
+
+  @Post('/:id/withdraw')
+  @Roles([EUserRole.USER])
+  @UseGuards(RolesGuard)
+  public async withdrawOffer(@Request() request, @Param('id') id: string) {
+    return await this.offerService.withdrawOffer(id, request.user.userId);
   }
 
   @Get('/:id')

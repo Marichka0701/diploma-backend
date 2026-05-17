@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -23,7 +24,7 @@ export class OfferEntity {
   @Column({ type: 'uuid' })
   applicationId: string;
 
-  @OneToOne(() => OrderEntity, (order) => order.offer)
+  @ManyToOne(() => OrderEntity, (order) => order.offers)
   @JoinColumn({ name: 'orderId' })
   order: OrderEntity;
 
@@ -32,6 +33,9 @@ export class OfferEntity {
 
   @Column({ type: 'enum', enum: EOfferStatus, default: EOfferStatus.CREATED })
   status: EOfferStatus;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  expiresAt: Date | null;
 
   @CreateDateColumn({ name: 'createdAt' })
   createdAt: Date;

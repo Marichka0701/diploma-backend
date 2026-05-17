@@ -7,6 +7,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { OfferEntity } from '../offer/entities/offer.entity';
+import { EOfferStatus } from '../offer/enums/offer-status.enum';
 import { OrderEntity } from '../order/entities/order.entity';
 import { EOrderStatus } from '../order/enums/order-status.enum';
 import { CreateFeedbackDto } from './dtos/requests/create-feedback.dto';
@@ -30,7 +32,12 @@ export class FeedbackService {
   public async create(authorId: string, dto: CreateFeedbackDto) {
     const order = await this.orderRepository.findOne({
       where: { id: dto.orderId },
-      relations: ['user', 'offer', 'offer.application', 'offer.application.cleaner'],
+      relations: [
+        'user',
+        'offers',
+        'offers.application',
+        'offers.application.cleaner',
+      ],
     });
 
     if (!order) {
@@ -43,8 +50,12 @@ export class FeedbackService {
       );
     }
 
+    const offers: OfferEntity[] = order.offers ?? [];
+    const acceptedOffer = offers.find(
+      (o: OfferEntity) => o.status === EOfferStatus.ACCEPTED,
+    );
     const customerId = order.user?.id;
-    const cleanerId = order.offer?.application?.cleaner?.id;
+    const cleanerId = acceptedOffer?.application?.cleaner?.id;
     let recipientId: string;
 
     if (customerId && authorId === customerId) {
